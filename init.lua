@@ -701,6 +701,44 @@ require('lazy').setup({
         -- ts_ls = {},
         --
 
+        ts_ls = {
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+                languages = { 'vue' },
+              },
+            },
+          },
+          preferences = {
+            importModuleSpecifierPreference = 'relative',
+          },
+        },
+        html = {},
+        cssls = {},
+        tailwindcss = {
+          on_new_config = function(new_config)
+            if not new_config.settings then
+              new_config.settings = {}
+            end
+            if not new_config.settings.editor then
+              new_config.settings.editor = {}
+            end
+            if not new_config.settings.editor.tabSize then
+              -- set tab size for hover
+              new_config.settings.editor.tabSize = vim.lsp.util.get_effective_tabstop()
+            end
+          end,
+        },
+        emmet_ls = {},
+
+        -- htmx = {},
+
+        eslint = {},
+        eslint_d = {},
+
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -733,6 +771,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'markdownlint',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -778,8 +817,8 @@ require('lazy').setup({
           return nil
         else
           return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
+            timeout_ms = 10000,
+            lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
           }
         end
       end,
@@ -789,7 +828,16 @@ require('lazy').setup({
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        -- You can use a sub-list to tell conform to run *until* a formatter
+        -- is found.
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        vue = { 'prettierd', 'prettier', stop_after_first = true },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        css = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
